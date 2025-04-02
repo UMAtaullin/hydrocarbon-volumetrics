@@ -9,6 +9,7 @@
 
 
 ## Структура проекта:
+```
 hydrocarbon-calculator/
 ├── src/
 │   ├── cli.py            # Точка входа (командная строка)
@@ -22,7 +23,7 @@ hydrocarbon-calculator/
 ├── docs/
 │   └── user_guide.md     # Инструкция
 └── README.md
-
+```
 
 ## Установка:
 ```bash
