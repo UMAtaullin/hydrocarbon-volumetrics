@@ -9,19 +9,19 @@
 
 
 ## Структура проекта:
-hydrocarbon-volumetrics/
+hydrocarbon-calculator/
 ├── src/
-│   ├── calculator.py       # Основной расчётный модуль
-│   └── visualization.py    # Построение графиков
+│   ├── cli.py            # Точка входа (командная строка)
+│   ├── calculator.py     # Логика расчётов
+│   └── config_loader.py  # Загрузка настроек
+├── config/
+│   └── default.yaml      # Параметры по умолчанию
 ├── data/
-│   └── example_well.las    # Пример LAS-файла
-├── tests/
-│   └── test_calculator.py  # Тесты
+│   ├── input/            # Папка для LAS-файлов
+│   └── output/           # Результаты расчётов
 ├── docs/
-│   └── tutorial.ipynb     # Jupyter-ноутбук с примерами
-├── README.md               # Описание проекта
-├── requirements.txt        # Зависимости
-└── LICENSE                 # Лицензия MIT
+│   └── user_guide.md     # Инструкция
+└── README.md
 
 
 ## Установка:

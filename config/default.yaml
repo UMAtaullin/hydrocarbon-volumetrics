@@ -1,0 +1,6 @@
+calculator:
+  area_m2: 250000    # Площадь в м²
+  bo: 1.2            # Объёмный коэффициент нефти
+  oil_density: 0.85  # Плотность нефти (т/м³)
+
+default_las: "data/input/well_123.las"
