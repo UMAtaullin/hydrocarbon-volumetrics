@@ -1,24 +1,33 @@
 import argparse
 from src.calculator import HydrocarbonCalculator
-from src.config_loader import load_config, validate_config
+
+
+def format_number(num):
+    return f"{num:,.0f}".replace(",", " ")
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Калькулятор запасов углеводородов")
+    parser = argparse.ArgumentParser(description="Калькулятор запасов нефти (STOIIP)")
+    parser.add_argument("--las", required=True, help="Путь к LAS-файлу")
     parser.add_argument(
-        "--config", default="config/default.yaml", help="Путь к конфиг-файлу"
+        "--area", type=float, required=True, help="Площадь месторождения (м²)"
     )
-    parser.add_argument("--las", help="Путь к LAS-файлу")
     args = parser.parse_args()
 
-    config = load_config(args.config)
-    validate_config(config)
+    calc = HydrocarbonCalculator(area_m2=args.area)
+    params = calc.from_las(args.las)
+    reserves = calc.calculate_stoiip(**params)
 
-    calc = HydrocarbonCalculator(**config["calculator"])
+    print("\n=== РЕЗУЛЬТАТЫ ===")
+    print(f"Параметры пласта:")
+    print(f"- Толщина: {params['thickness']:.2f} м")
+    print(f"- Пористость: {params['porosity']:.3f}")
+    print(f"- Насыщенность: {params['oil_saturation']:.1%}")
 
-    if args.las:
-        results = calc.from_las(args.las)
-        print(f"Результаты:\n{results}")
+    print("\nЗапасы нефти (STOIIP):")
+    print(f"- {format_number(reserves['m3'])} м³")
+    print(f"- {format_number(reserves['tons'])} тонн")
+    print(f"- {format_number(reserves['bbl'])} баррелей")
 
 
 if __name__ == "__main__":

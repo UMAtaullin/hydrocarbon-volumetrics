@@ -3,11 +3,6 @@ import lasio
 
 
 class HydrocarbonCalculator:
-    """
-    Калькулятор запасов нефти (STOIIP) и газа (GIIP) по объёмному методу.
-    Поддерживает загрузку данных из LAS-файлов.
-    """
-
     def __init__(self, area_m2, bo=1.2, bg=0.0035, oil_density=0.85, gas_density=0.75):
         self.area = area_m2
         self.bo = bo
@@ -15,26 +10,27 @@ class HydrocarbonCalculator:
         self.oil_density = oil_density
         self.gas_density = gas_density
 
+    def calculate_stoiip(self, thickness, porosity, oil_saturation):
+        """Расчёт запасов нефти (STOIIP)"""
+        stoiip_m3 = self.area * thickness * porosity * oil_saturation / self.bo
+        return {
+            "m3": stoiip_m3,
+            "tons": stoiip_m3 * self.oil_density,
+            "bbl": stoiip_m3 * 6.2898,  # Конвертация в баррели
+        }
 
     def from_las(self, las_path, vsh_cutoff=0.3):
-        """Адаптированная версия для новых lasio и вашего формата данных"""
         las = lasio.read(las_path)
         df = las.df()
 
-        # 1. Определяем шаг дискретизации
-        if len(df.index) > 1:
-            step = abs(df.index[1] - df.index[0])  # Автоматическое определение шага
-        else:
-            step = 0.1  # Значение по умолчанию
+        # Автоматическое определение шага дискретизации
+        step = abs(df.index[1] - df.index[0]) if len(df.index) > 1 else 0.1
 
-        # 2. Расчёт глинистости через GR (нормализованный)
+        # Расчёт параметров
         df["VSH"] = 1 - (df["GR"] / df["GR"].max())
-
-        # 3. Расчёт пористости через DFAR (формула для песчаников)
         df["PHIT"] = (2.65 - df["DFAR"]) / (2.65 - 1.0)
-        df["PHIT"] = df["PHIT"].clip(0, 0.4)  # Ограничиваем реалистичные значения
+        df["PHIT"] = df["PHIT"].clip(0, 0.4)
 
-        # 4. Фильтрация по глинистости
         clean_zone = df[df["VSH"] < vsh_cutoff]
 
         return {
